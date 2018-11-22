@@ -1,1 +1,4 @@
 # reactive-spring
+
+##Requirements
+Mongodb
