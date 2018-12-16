@@ -12,6 +12,9 @@ import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiFunction;
 
 @RestController
 public class TweetController {
@@ -24,7 +27,8 @@ public class TweetController {
 
     @PostConstruct
     public void init(){
-        reactiveMongoTemplate.dropCollection("tweets").then(reactiveMongoTemplate.createCollection("tweets", CollectionOptions.empty().capped().size(2048).maxDocuments(10000))).subscribe();
+        reactiveMongoTemplate.dropCollection("tweets")
+                .then(reactiveMongoTemplate.createCollection("tweets", CollectionOptions.empty().capped().size(2048).maxDocuments(10000))).subscribe();
     }
 
     @GetMapping("/add/tweet")
@@ -78,8 +82,44 @@ public class TweetController {
     }
 
     // Tweets are Sent to the client as Server Sent Events
+    @CrossOrigin
     @GetMapping(value = "/stream/tweets", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Tweet> streamAllTweets() {
         return tweetRepository.findByCreatedBy("System");
+    }
+
+
+    // Tweets are Sent to the client as Server Sent Events
+    @CrossOrigin
+    @GetMapping(value = "/stream/cvs/tweets", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Tweet> streamAllTweetsWithCVS() {
+        return tweetRepository.findByTextStartingWith("#CVS");
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/stream/walgreens/tweets", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Tweet> streamAllTweetsWithWalgreens() {
+        return tweetRepository.findByTextStartingWith("#Walgreens");
+    }
+
+
+    @CrossOrigin
+    @GetMapping(value = "/stream/walgreens-and-cvs/tweets", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Tweet> streamAllTweetsWithWalgreensAndCVS() {
+        return Flux.merge(
+                tweetRepository.findByTextStartingWith("#CVS"),
+                tweetRepository.findByTextStartingWith("#Walgreens")
+        );
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/stream-and-zip/walgreens-and-cvs/tweets", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<List<Tweet>> streamAllTweetsWithWalgreensAndCVSZip() {
+        Flux<List<Tweet>> tweets = Flux.zip(
+                tweetRepository.findByTextStartingWith("#CVS"),
+                tweetRepository.findByTextStartingWith("#Walgreens"),
+                (tweet, tweet2) -> Arrays.asList(tweet,tweet2)
+        );
+        return tweets;
     }
 }

@@ -10,4 +10,8 @@ public interface TweetRepository extends ReactiveMongoRepository<Tweet, String> 
 
     @Tailable
     Flux<Tweet> findByCreatedBy(String s);
+
+    @Tailable
+    Flux<Tweet> findByTextStartingWith(String s);
+
 }

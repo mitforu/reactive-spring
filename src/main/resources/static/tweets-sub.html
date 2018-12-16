@@ -1,0 +1,34 @@
+<html>
+<script type="text/javascript">
+    function subscribeTOCVS() {
+        var cvs = new EventSource('http://localhost:8080/stream/cvs/tweets');
+        cvs.onmessage = function (evt) {
+            var el = document.getElementById('CVS');
+            el.appendChild(document.createTextNode(JSON.parse(evt.data).text));
+            el.appendChild(document.createElement('br'));
+        };
+    }
+
+    function subscribeTOWalgreens() {
+        var cvs = new EventSource('http://localhost:8080/stream/walgreens/tweets');
+        cvs.onmessage = function (evt) {
+            var el = document.getElementById('Walgreens');
+            el.appendChild(document.createTextNode(JSON.parse(evt.data).text));
+            el.appendChild(document.createElement('br'));
+        };
+    }
+
+</script>
+<body>
+<div style="display: flex;">
+    <button onclick="subscribeTOCVS()">Subscribe to #CVS</button>
+    <button onclick="subscribeTOWalgreens()">Subscribe to #Walgreens</button><br/><br/><br/>
+
+</div>
+
+<div style="display: flex;">
+    <div id="CVS"></div>
+    <div id="Walgreens"></div>
+</div>
+</body>
+</html>

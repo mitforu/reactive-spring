@@ -12,9 +12,7 @@ import java.util.concurrent.Executors;
 
 @Controller
 public class SseEmitterController {
-    private ExecutorService nonBlockingService = Executors
-      .newCachedThreadPool();
-     
+
     @GetMapping("/sse")
     @CrossOrigin
     public SseEmitter handleSse() {

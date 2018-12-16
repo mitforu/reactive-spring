@@ -1,0 +1,13 @@
+<html>
+<body>
+    <script type="text/javascript">
+        var sse = new EventSource('http://localhost:8080/stream/tweets');
+        sse.onmessage = function (evt) {
+            var el = document.getElementById('flux');
+            el.appendChild(document.createTextNode(evt.data));
+            el.appendChild(document.createElement('br'));
+        };
+    </script>
+    <div id="flux"></div>
+</body>
+</html>
